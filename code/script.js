@@ -1,13 +1,15 @@
+// sofia-test-new-flow SEPARATE BRANCH
+
 // Global variables
-let userName = ""
+let userName = "buddy"
 let mainFoodChoice = ""
 let foodSubtype = ""
 let partySize = "10"
 let orderValue 
-let onePizzaPrice = 15
-let oneSaladPrice = 18
-let onePastaPrice = 12
-let confirmPrice = ""
+const onePizzaPrice = 15
+const oneSaladPrice = 18
+const onePastaPrice = 12
+let orderConfirmed = false
 
 // ------------------------------------------------
 // DOM selectors (variables that point to selected DOM elements) goes here 👇
@@ -25,7 +27,6 @@ const pastaButton = document.createElement("button")
 const saladButton = document.createElement("button")
 const foodDiv = document.createElement("div")
 
-
 //subtypeFood
 const subtypeDiv = document.createElement("div")
 
@@ -33,7 +34,6 @@ const subtypeDiv = document.createElement("div")
 const italianButton = document.createElement("button")
 const hawaiiButton = document.createElement("button")
 const veganButton = document.createElement("button")
-
 
 // PASTA
 const carbonaraButton = document.createElement("button")
@@ -62,161 +62,77 @@ const noButton = document.getElementById("no")
 // ------------------------------------------------
 // Functions goes here 👇
 
-// A function that will add a chat bubble in the correct place based on who the sender is
-const showMessage = (message, sender) => {
-  // The if statement checks if the sender is the user and if that's the case it inserts
-  // an HTML section inside the chat with the posted message from the user
-  if (sender === 'user') {
-    chat.innerHTML += `
-      <section class="user-msg">
-        <div class="bubble user-bubble">
-          <p>${message}</p>
-        </div>
-        <img src="assets/user.png" alt="User" />  
-      </section>
-    `
-    // The else if statement checks if the sender is the bot and if that's the case it inserts
-    // an HTML section inside the chat with the posted message from the bot
-  } else if (sender === 'bot') {
-    chat.innerHTML += `
-      <section class="bot-msg">
-        <img src="assets/bot.png" alt="Bot" />
-        <div class="bubble bot-bubble">
-          <p>${message}</p>
-        </div>
-      </section>
-    `
+// Function triggered by event! to show confirmation and end chat
+
+const restartChat = () => {
+  chat.innerHTML = ""
+  greetUser()
+}
+
+const finalConfirm = () => {
+  inputWrapper.innerHTML = ""
+  if (orderConfirmed) {
+    showMessage(`Yes`, "user")
+    setTimeout(() => showMessage(`Perfect! We'll get right on that!`, "bot"), 1000)
+    console.log("Order confirmed")
+    } else {
+      showMessage(`No`, "user")
+      setTimeout(() => showMessage(`Too bad. But you're welcome back another time!`, "bot"), 1000)
+      console.log("Order not confirmed")
   }
-
-  // This little thing makes the chat scroll to the last message when there are too many to
-  // be shown in the chat box
-  chat.scrollTop = chat.scrollHeight
+  setTimeout(() => restartChat(), 3000)
 }
 
-// A function to start the conversation
-const greetUser = () => {
-  // Here we call the function showMessage, that we declared earlier with the argument:
-  // "Hello there, what's your name?" for message, and the argument "bot" for sender
-  showMessage("Hello there, what's your name?", 'bot')
-  // Just to check it out, change 'bot' to 'user' here 👆 and see what happens
+// Function to display order confirmation buttons
+const displayUserConfirm = () => {
+  console.log("Asking for order confirmation")
+  showMessage(`Got it! You have ordered ${foodSubtype} for ${partySize} people, to a total of ${orderValue} €. Is that OK?`, "bot")
+  inputWrapper.innerHTML =
+  `<div id="button-form">
+    <button id="yes" type="Submit">Yes</button>
+    <button id="no" type="Submib">No</button>
+  </div>`
+
+  document.getElementById("yes").addEventListener("click", () =>  {
+    orderConfirmed = true
+    finalConfirm()
+  })
+  document.getElementById("no").addEventListener("click", () => {
+    orderConfirmed = false
+    finalConfirm()
+  })
 }
 
-// function to save name and send to showMessage, and move on
-const submitName = (event) => {
-  event.preventDefault() // prevents submit from clearing and starting over??
-  userName = nameInput.value
-  nameInput.value = ""
-  showMessage(userName, "user")
-  setTimeout(() => chooseFood(), 1000) // Go to next step, chooseFood
+// Function to calculate order value based on food choice and party size
+const calculateOrderValue = () => {
+  console.log(`Calculate order value for ${partySize} people...`)
+  switch (mainFoodChoice) {
+    case "Pizza":
+      orderValue = partySize * onePizzaPrice
+      break;
+    case "Pasta":
+      orderValue = partySize * onePastaPrice
+      break;
+    case "Salad":
+      orderValue = partySize * oneSaladPrice
+      break;
+    default:
+      break;
+  }
+  displayUserConfirm()
 }
 
-// function to ask for food choice and send to displayFood
-const chooseFood = () => {
-  showMessage(`What kind of food would you like us to serve, ${userName}?`, "bot")
-  displayFood();
+// Function triggered by event! to handle party size value
+const submitPartysize = (event) => {
+  event.preventDefault()
+  console.log("Partysize:", partySize)
+  showMessage(partySize, "user")
+  calculateOrderValue()
 }
 
-// Function to show food choices
-const displayFood = () => {
-  // Display buttons
-  pizzaButton.textContent = "Pizza" // Adds text in button
-  pastaButton.textContent = "Pasta"
-  saladButton.textContent = "Salad"
-
-  foodDiv.append(pizzaButton, pastaButton, saladButton) // Places buttons in foodDiv
-  inputWrapper.replaceChild(foodDiv, nameForm) // Replaces the nameForm with the new foodDiv
-  console.log("Showing food buttons")
-}
-
-// User clicks a button with event listener
-// One of following select functions will continue
-
-// IF PIZZA
-const selectPizza = () => {
-  mainFoodChoice = "Pizza"
-  console.log("Main food: ", mainFoodChoice)
-  showMessage(`${mainFoodChoice}`, "user")
-  setTimeout(() => {
-    showMessage(`Ok! What kind of ${mainFoodChoice}?`, "bot")
-    displayPizzaSubtypes() // Go to next step
-  }, 1000)
-}
-
-const displayPizzaSubtypes = () => {
-  // Display buttons
-  italianButton.textContent = "Italian Pizza"
-  hawaiiButton.textContent = "Hawaii Pizza"
-  veganButton.textContent = "Vegan Pizza"
-
-  subtypeDiv.append(italianButton, hawaiiButton, veganButton)
-  inputWrapper.replaceChild(subtypeDiv, foodDiv)
-  console.log("Showing pizza buttons")
-}
-
-// IF PASTA
-const selectPasta = () => {
-  mainFoodChoice = "Pasta"
-  console.log("Main food: ", mainFoodChoice)
-  showMessage(`${mainFoodChoice}`, "user")
-  setTimeout(() => {
-    showMessage(`Ok! What kind of ${mainFoodChoice}?`, "bot")
-    displayPastaSubtypes() // Go to next step
-  }, 1000)
-}
-const displayPastaSubtypes = () => {
-  // Display buttons
-  carbonaraButton.textContent = "Pasta Carbonara"
-  bolognaiseButton.textContent = "Spaghetti Bolognaise"
-  lasagneButton.textContent = "Vegetarian Lasagne"
-
-  subtypeDiv.append(carbonaraButton, bolognaiseButton, lasagneButton)
-  inputWrapper.replaceChild(subtypeDiv, foodDiv)
-  console.log("Showing pasta buttons")
-}
-// IF SALAD
-const selectSalad = () => {
-  mainFoodChoice = "Salad"
-  console.log("Main food: ", mainFoodChoice)
-  showMessage(`${mainFoodChoice}`, "user")
-  setTimeout(() => {
-    showMessage(`Ok! What kind of ${mainFoodChoice}?`, "bot")
-    displaySaladSubtypes() // Go to next step
-  }, 1000)
-}
-
-// displaySaladSubtypes
-const displaySaladSubtypes = () => {
-  caesarButton.textContent = "Caesar Salad"
-  capreseButton.textContent = "Caprese Salad"
-  greekButton.textContent = "Greek Salad"
-
-  subtypeDiv.append(caesarButton, capreseButton,greekButton)
-  inputWrapper.replaceChild(subtypeDiv, foodDiv)
-}
-
-// save Subtype and send to showMessage, and move on (foodSubtype = subtype? can we just use subtype?)
-const submitSubtype = (subtype) => {
-  foodSubtype = subtype
-  console.log("Subtype:", foodSubtype, typeof (foodSubtype))
-  showMessage(foodSubtype, "user")
-  setTimeout(() => {
-    showMessage(`Good choice! Our ${foodSubtype} is submlime.`, "bot")
-  }, 1000)
-  selectParty()// Go to next step
-}
-
-// Get party size to calculate prize
-const selectParty = () => {
-  console.log(`Party!🥳`)
-  setTimeout(() => {
-    showMessage(`How many people are in your party? 🥳`, "bot")
-    displayPartyInput() // Go to next step
-  }, 1000)
-}
-
-
+// Function to display party input
 const displayPartyInput = () => {
-  // Display buttons
+  // Display form
   partyInput.type = "range"
   partyInput.id = "party-input"
   partyInput.value = "10"
@@ -231,76 +147,140 @@ const displayPartyInput = () => {
   console.log("Showing party input and waiting...")
 }
 
-const submitPartysize = (event) => {
-  event.preventDefault()
-  console.log("Partysize:", partySize)
-  showMessage(partySize, "user")
-  calculateOrderValue()
+// Get size of party
+const selectParty = () => {
+  console.log(`Party!🥳`)
+  setTimeout(() => {
+    showMessage(`How many people are in your party? 🥳`, "bot")
+    displayPartyInput() // Go to next step
+  }, 1000)
 }
 
-const calculateOrderValue = () => {
-  console.log(`Calculate order value for ${partySize} people...`)
-  setTimeout(() => {cost()},2000)
+// function triggered by event! save Subtype and send to showMessage, and move on (foodSubtype = subtype? can we just use subtype?)
+const submitSubtype = (event) => {
+  foodSubtype = event.target.textContent
+  console.log("Subtype:", foodSubtype)
+  showMessage(foodSubtype, "user")
+  setTimeout(() => {
+    showMessage(`Good choice! Our ${foodSubtype} is submlime.`, "bot")
+    setTimeout(() => selectParty(), 500)// Go to next step
+  }, 1000)
 }
 
-const cost = () => {
-  inputWrapper.removeChild(partyForm)
-  if (mainFoodChoice === "Pizza"){
-    orderValue = partySize * onePizzaPrice
-    showMessage(`You have ordered ${partySize} ${foodSubtype}, here is your bill: ${orderValue} €. Is that ok?`, "bot")
-  } else if (mainFoodChoice === "Pasta"){
-    orderValue = partySize *onePastaPrice
-    showMessage(`You have ordered ${partySize} ${foodSubtype}, here is your bill: ${orderValue} €. Is that ok?`, "bot")
-  }else if(mainFoodChoice === "Salad"){
-    orderValue = partySize * oneSaladPrice
-    showMessage(`You have ordered ${partySize} ${foodSubtype}, here is your bill: ${orderValue} €. Is that ok?`, "bot")
-  }
+// function to display Pizza subtypes
+const displayPizzaSubtypes = () => {
+  // Display buttons
+  italianButton.textContent = "Italian Pizza"
+  hawaiiButton.textContent = "Hawaii Pizza"
+  veganButton.textContent = "Vegan Pizza"
 
-  userConfirm()
-}
-//////////!!!!!! button doesn't work!!!/////
-const userConfirm = () => {
-  /*yesButton.textConten = "yes"
-  noButton.textContent = "no"
-
-  confirmDiv.append(yesButton, noButton)*/
-  inputWrapper.innerHTML=
-  `<div id="button-form">
-    <button id="yes" type="Submit">Yes</button>
-    <button id="no" type="Submib">No</button>
-  </div>`
-
-  document.getElementById("yes").addEventListener("click", () =>  {
-    confirmPrice = "Yes"
-    showMessage(`Yes`, "user")
-  })
-  document.getElementById("no").addEventListener("click", () => {
-    confirmPrice = "No"
-    showMessage(`No`, "user")
-  })
+  subtypeDiv.append(italianButton, hawaiiButton, veganButton)
+  inputWrapper.replaceChild(subtypeDiv, foodDiv)
+  console.log("Showing pizza buttons")
 }
 
-/*const finalConfirm = (answer) => {
+// function to display Pasta subtypes
+const displayPastaSubtypes = () => {
+  // Display buttons
+  carbonaraButton.textContent = "Pasta Carbonara"
+  bolognaiseButton.textContent = "Spaghetti Bolognaise"
+  lasagneButton.textContent = "Vegetarian Lasagne"
 
-  if (answer === "yes") {
-    confirmPrice = "Yes"
-    showMessage(`Yes`, "user")
-    console.log(answer)
-    } else {
-      confirmPrice = "No"
-      showMessage(`No`, "user")
-      console.log(answer)
-  // finalConfirm()
-  }
-}*/
+  subtypeDiv.append(carbonaraButton, bolognaiseButton, lasagneButton)
+  inputWrapper.replaceChild(subtypeDiv, foodDiv)
+  console.log("Showing pasta buttons")
+}
 
+// function to display Salad subtypes
+const displaySaladSubtypes = () => {
+  caesarButton.textContent = "Caesar Salad"
+  capreseButton.textContent = "Caprese Salad"
+  greekButton.textContent = "Greek Salad"
 
+  subtypeDiv.append(caesarButton, capreseButton,greekButton)
+  inputWrapper.replaceChild(subtypeDiv, foodDiv)
+  console.log("Showing salad buttons")
+}
 
-
+// function triggered by event! to handle the food choice from event listeners and call on next function
+const submitFoodChoice = (event) => {
+  mainFoodChoice = event.target.textContent
+  console.log("Main food: ", mainFoodChoice)
+  showMessage(`${mainFoodChoice}`, "user")
+  setTimeout(() => {
+    showMessage(`Ok! What kind of ${mainFoodChoice}?`, "bot")
+    switch (event.target.id) {
+      case "pizza-btn":
+        displayPizzaSubtypes() // Go to next step
+        break;
+      case "pasta-btn":
+        displayPastaSubtypes() // Go to next step
+        break;
+      case "salad-btn":
+        displaySaladSubtypes() // Go to next step
+        break;
+      default:
+        showMessage("Something went wrong, try again", "bot")
+        break;
+    }
+  }, 1000)
   
+}
 
+// Function to display food choices
+const displayFood = () => {
+  showMessage(`What kind of food would you like us to serve, ${userName}?`, "bot")
+  // Display buttons
+  pizzaButton.textContent = "Pizza" // Adds text in button
+  pizzaButton.id = "pizza-btn" // Adds id to button
+  pastaButton.textContent = "Pasta"
+  pastaButton.id = "pasta-btn"
+  saladButton.textContent = "Salad"
+  saladButton.id = "salad-btn"
 
+  foodDiv.append(pizzaButton, pastaButton, saladButton) // Places buttons in foodDiv
+  inputWrapper.replaceChild(foodDiv, nameForm) // Replaces the nameForm with the new foodDiv
+  console.log("Showing food buttons")
+}
 
+// function triggered by event! to save name and send to showMessage, and move on
+const submitName = (event) => {
+  event.preventDefault()
+  nameInput.value ? userName = nameInput.value :
+  nameInput.value = ""
+  showMessage(nameInput.value, "user")
+  setTimeout(() => displayFood(), 1000) // Go to next step, chooseFood
+}
+// Function to display message in chat
+const showMessage = (message, sender) => {
+  if (sender === 'user') {
+    chat.innerHTML += `
+      <section class="user-msg">
+        <div class="bubble user-bubble">
+          <p>${message}</p>
+        </div>
+        <img src="assets/user.png" alt="User" />  
+      </section>
+    `
+  } else if (sender === 'bot') {
+    chat.innerHTML += `
+      <section class="bot-msg">
+        <img src="assets/bot.png" alt="Bot" />
+        <div class="bubble bot-bubble">
+          <p>${message}</p>
+        </div>
+      </section>
+    `
+  }
+  chat.scrollTop = chat.scrollHeight
+}
+
+// A function to start the conversation
+const greetUser = () => {
+  showMessage("Hello there, what's your name?", 'bot')
+}
+
+//------ Start from bottom up -------
 
 // ------------------------------------------------
 // Eventlisteners goes here 👇
@@ -317,24 +297,24 @@ setTimeout(greetUser, 1000)
 nameButton.addEventListener("click", submitName) // Event listener for submit button in form
 
 // Food
-pizzaButton.addEventListener("click", selectPizza) // 
-pastaButton.addEventListener("click", selectPasta) // 
-saladButton.addEventListener("click", selectSalad) // 
+pizzaButton.addEventListener("click", (event) => submitFoodChoice(event))
+pastaButton.addEventListener("click", (event) => submitFoodChoice(event)) 
+saladButton.addEventListener("click", (event) => submitFoodChoice(event)) 
 
 // Pizza
-italianButton.addEventListener("click", () => submitSubtype(italianButton.textContent)) // 
-hawaiiButton.addEventListener("click", () => submitSubtype(hawaiiButton.textContent)) // 
-veganButton.addEventListener("click", () => submitSubtype(veganButton.textContent)) // 
+italianButton.addEventListener("click", (event) => submitSubtype(event)) // 
+hawaiiButton.addEventListener("click", (event) => submitSubtype(event)) // 
+veganButton.addEventListener("click", (event) => submitSubtype(event)) // 
 
 // Pasta
-carbonaraButton.addEventListener("click", () => submitSubtype(carbonaraButton.textContent)) // 
-bolognaiseButton.addEventListener("click", () => submitSubtype(bolognaiseButton.textContent)) // 
-lasagneButton.addEventListener("click", () => submitSubtype(lasagneButton.textContent)) // 
+carbonaraButton.addEventListener("click", (event) => submitSubtype(event)) // 
+bolognaiseButton.addEventListener("click", (event) => submitSubtype(event)) // 
+lasagneButton.addEventListener("click", (event) => submitSubtype(event)) // 
 
 // Salad
-caesarButton.addEventListener("click", () => submitSubtype(caesarButton.textContent))
-capreseButton.addEventListener("click", () => submitSubtype(capreseButton.textContent))
-greekButton.addEventListener("click", () => submitSubtype(capreseButton.textContent))
+caesarButton.addEventListener("click", (event) => submitSubtype(event))
+capreseButton.addEventListener("click", (event) => submitSubtype(event))
+greekButton.addEventListener("click", (event) => submitSubtype(event))
 
 // Party
 partyInput.addEventListener("input", () => {
