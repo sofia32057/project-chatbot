@@ -22,28 +22,19 @@ const nameInput = document.getElementById("name-input") // Select the name input
 const nameForm = document.getElementById("name-form")
 
 // FOOD
-const pizzaButton = document.createElement("button")
-const pastaButton = document.createElement("button")
-const saladButton = document.createElement("button")
+const firstFoodBtn = document.createElement("button")
+const secondFoodBtn = document.createElement("button")
+const thirdFoodBtn = document.createElement("button")
 const foodDiv = document.createElement("div")
+foodDiv.append(firstFoodBtn, secondFoodBtn, thirdFoodBtn) // Places buttons in div for food
 
-//subtypeFood
+// //subtypeFood
+const firstSubtypeBtn = document.createElement("button")
+const secondSubtypeBtn = document.createElement("button")
+const thirdSubtypeBtn = document.createElement("button")
 const subtypeDiv = document.createElement("div")
+subtypeDiv.append(firstSubtypeBtn, secondSubtypeBtn, thirdSubtypeBtn) // Places buttons in div for subtypes
 
-// PIZZA
-const italianButton = document.createElement("button")
-const hawaiiButton = document.createElement("button")
-const veganButton = document.createElement("button")
-
-// PASTA
-const carbonaraButton = document.createElement("button")
-const bolognaiseButton = document.createElement("button")
-const lasagneButton = document.createElement("button")
-
-// SALAD
-const caesarButton = document.createElement("button")
-const capreseButton = document.createElement("button")
-const greekButton = document.createElement("button")
 // Party
 const partyLabel = document.createElement("label")
 const partyInput = document.createElement("input")
@@ -51,13 +42,8 @@ const partyButton = document.createElement("button")
 const partyForm = document.createElement("form")
 
 //user confirm
-/*const confirmDiv = document.getElementById("button-form")*/
 const yesButton = document.getElementById("yes")
 const noButton = document.getElementById("no")
-// const confirmDiv = document.createElement("div")
-// const yesButton = document.createElement("button")
-// const noButton = document.createElement("button")
-
 
 // ------------------------------------------------
 // Functions goes here 👇
@@ -65,28 +51,51 @@ const noButton = document.getElementById("no")
 // Function triggered by event! to show confirmation and end chat
 
 const restartChat = () => {
-  chat.innerHTML = ""
-  greetUser()
+  location.reload()
+}
+
+const submitDeliveryDate = (event) => {
+  event.preventDefault()
+  const datePicker = document.getElementById("date-picker")
+  inputWrapper.innerHTML = ""
+  showMessage(datePicker.value, "user")
+  setTimeout(() => {
+    showMessage(`Great, see you on ${datePicker.value}`, "bot")
+    setTimeout(restartChat, 3000)
+  }, 1000)
+
+}
+
+const displayDeliveryDatePicker = () => {
+  inputWrapper.innerHTML = 
+  `<form id="date-form">
+    <label for="date-picker">Pick delivery date</label>
+    <input id="date-picker" type="date">
+    <button id="date-btn">Send</button>
+  </form>`
+  showMessage(`Perfect! When do you want this delivery?`, "bot")
+  document.getElementById("date-btn").addEventListener("click", submitDeliveryDate)
 }
 
 const finalConfirm = () => {
   inputWrapper.innerHTML = ""
   if (orderConfirmed) {
     showMessage(`Yes`, "user")
-    setTimeout(() => showMessage(`Perfect! We'll get right on that!`, "bot"), 1000)
+    setTimeout(displayDeliveryDatePicker, 1000)
     console.log("Order confirmed")
     } else {
       showMessage(`No`, "user")
       setTimeout(() => showMessage(`Too bad. But you're welcome back another time!`, "bot"), 1000)
       console.log("Order not confirmed")
   }
-  setTimeout(() => restartChat(), 3000)
 }
 
 // Function to display order confirmation buttons
 const displayUserConfirm = () => {
   console.log("Asking for order confirmation")
-  showMessage(`Got it! You have ordered ${foodSubtype} for ${partySize} people, to a total of ${orderValue} €. Is that OK?`, "bot")
+  showMessage(
+    `Got it! You have ordered ${foodSubtype} for ${partySize} people, to a total of ${orderValue} €. Is that OK?`, "bot"
+    )
   inputWrapper.innerHTML =
   `<div id="button-form">
     <button id="yes" type="Submit">Yes</button>
@@ -119,7 +128,7 @@ const calculateOrderValue = () => {
     default:
       break;
   }
-  displayUserConfirm()
+  setTimeout(displayUserConfirm, 1000)
 }
 
 // Function triggered by event! to handle party size value
@@ -143,7 +152,7 @@ const displayPartyInput = () => {
   partyButton.textContent = "Send"
 
   partyForm.append(partyLabel, partyInput, partyButton)
-  inputWrapper.replaceChild(partyForm, subtypeDiv)
+  inputWrapper.append(partyForm)
   console.log("Showing party input and waiting...")
 }
 
@@ -151,8 +160,8 @@ const displayPartyInput = () => {
 const selectParty = () => {
   console.log(`Party!🥳`)
   setTimeout(() => {
-    showMessage(`How many people are in your party? 🥳`, "bot")
     displayPartyInput() // Go to next step
+    showMessage(`How many people are in your party? 🥳`, "bot")
   }, 1000)
 }
 
@@ -162,19 +171,19 @@ const submitSubtype = (event) => {
   console.log("Subtype:", foodSubtype)
   showMessage(foodSubtype, "user")
   setTimeout(() => {
-    showMessage(`Good choice! Our ${foodSubtype} is submlime.`, "bot")
-    setTimeout(() => selectParty(), 500)// Go to next step
+    inputWrapper.removeChild(subtypeDiv)
+    showMessage(`Good choice! Our ${foodSubtype} is sublime.`, "bot")
+    setTimeout(selectParty, 1000)// Go to next step
   }, 1000)
 }
 
 // function to display Pizza subtypes
 const displayPizzaSubtypes = () => {
   // Display buttons
-  italianButton.textContent = "Italian Pizza"
-  hawaiiButton.textContent = "Hawaii Pizza"
-  veganButton.textContent = "Vegan Pizza"
+  firstSubtypeBtn.textContent = "Italian Pizza"
+  secondSubtypeBtn.textContent = "Hawaii Pizza"
+  thirdSubtypeBtn.textContent = "Vegan Pizza"
 
-  subtypeDiv.append(italianButton, hawaiiButton, veganButton)
   inputWrapper.replaceChild(subtypeDiv, foodDiv)
   console.log("Showing pizza buttons")
 }
@@ -182,41 +191,40 @@ const displayPizzaSubtypes = () => {
 // function to display Pasta subtypes
 const displayPastaSubtypes = () => {
   // Display buttons
-  carbonaraButton.textContent = "Pasta Carbonara"
-  bolognaiseButton.textContent = "Spaghetti Bolognaise"
-  lasagneButton.textContent = "Vegetarian Lasagne"
+  firstSubtypeBtn.textContent = "Pasta Carbonara"
+  secondSubtypeBtn.textContent = "Spaghetti Bolognaise"
+  thirdSubtypeBtn.textContent = "Vegetarian Lasagne"
 
-  subtypeDiv.append(carbonaraButton, bolognaiseButton, lasagneButton)
   inputWrapper.replaceChild(subtypeDiv, foodDiv)
   console.log("Showing pasta buttons")
 }
 
 // function to display Salad subtypes
 const displaySaladSubtypes = () => {
-  caesarButton.textContent = "Caesar Salad"
-  capreseButton.textContent = "Caprese Salad"
-  greekButton.textContent = "Greek Salad"
+  firstSubtypeBtn.textContent = "Caesar Salad"
+  secondSubtypeBtn.textContent = "Caprese Salad"
+  thirdSubtypeBtn.textContent = "Greek Salad"
 
-  subtypeDiv.append(caesarButton, capreseButton,greekButton)
   inputWrapper.replaceChild(subtypeDiv, foodDiv)
   console.log("Showing salad buttons")
 }
 
 // function triggered by event! to handle the food choice from event listeners and call on next function
 const submitFoodChoice = (event) => {
+  console.log(event)
   mainFoodChoice = event.target.textContent
   console.log("Main food: ", mainFoodChoice)
   showMessage(`${mainFoodChoice}`, "user")
   setTimeout(() => {
     showMessage(`Ok! What kind of ${mainFoodChoice}?`, "bot")
-    switch (event.target.id) {
-      case "pizza-btn":
+    switch (mainFoodChoice) {
+      case "Pizza":
         displayPizzaSubtypes() // Go to next step
         break;
-      case "pasta-btn":
+      case "Pasta":
         displayPastaSubtypes() // Go to next step
         break;
-      case "salad-btn":
+      case "Salad":
         displaySaladSubtypes() // Go to next step
         break;
       default:
@@ -230,15 +238,15 @@ const submitFoodChoice = (event) => {
 // Function to display food choices
 const displayFood = () => {
   showMessage(`What kind of food would you like us to serve, ${userName}?`, "bot")
-  // Display buttons
-  pizzaButton.textContent = "Pizza" // Adds text in button
-  pizzaButton.id = "pizza-btn" // Adds id to button
-  pastaButton.textContent = "Pasta"
-  pastaButton.id = "pasta-btn"
-  saladButton.textContent = "Salad"
-  saladButton.id = "salad-btn"
 
-  foodDiv.append(pizzaButton, pastaButton, saladButton) // Places buttons in foodDiv
+  // Assign class
+  foodDiv.querySelectorAll("button").forEach(el => el.classList.add("food-btn"))
+
+  // Display buttons
+  firstFoodBtn.textContent = "Pizza" // Adds text in button
+  secondFoodBtn.textContent = "Pasta"
+  thirdFoodBtn.textContent = "Salad"
+
   inputWrapper.replaceChild(foodDiv, nameForm) // Replaces the nameForm with the new foodDiv
   console.log("Showing food buttons")
 }
@@ -285,36 +293,14 @@ const greetUser = () => {
 // ------------------------------------------------
 // Eventlisteners goes here 👇
 
-// Here we invoke the first function to get the chatbot to ask the first question when
-// the website is loaded. Normally we invoke functions like this: greeting()
-// To add a little delay to it, we can wrap it in a setTimeout (a built in JavaScript function):
-// and pass along two arguments:
-// 1.) the function we want to delay, and 2.) the delay in milliseconds 
-// This means the greeting function will be called one second after the website is loaded.
 setTimeout(greetUser, 1000)
 
 // Name
 nameButton.addEventListener("click", submitName) // Event listener for submit button in form
 
 // Food
-pizzaButton.addEventListener("click", (event) => submitFoodChoice(event))
-pastaButton.addEventListener("click", (event) => submitFoodChoice(event)) 
-saladButton.addEventListener("click", (event) => submitFoodChoice(event)) 
-
-// Pizza
-italianButton.addEventListener("click", (event) => submitSubtype(event)) // 
-hawaiiButton.addEventListener("click", (event) => submitSubtype(event)) // 
-veganButton.addEventListener("click", (event) => submitSubtype(event)) // 
-
-// Pasta
-carbonaraButton.addEventListener("click", (event) => submitSubtype(event)) // 
-bolognaiseButton.addEventListener("click", (event) => submitSubtype(event)) // 
-lasagneButton.addEventListener("click", (event) => submitSubtype(event)) // 
-
-// Salad
-caesarButton.addEventListener("click", (event) => submitSubtype(event))
-capreseButton.addEventListener("click", (event) => submitSubtype(event))
-greekButton.addEventListener("click", (event) => submitSubtype(event))
+foodDiv.querySelectorAll("button").forEach(el => el.addEventListener("click", (event) => submitFoodChoice(event)))
+subtypeDiv.querySelectorAll("button").forEach(el => el.addEventListener("click", (event) => submitSubtype(event)))
 
 // Party
 partyInput.addEventListener("input", () => {
@@ -322,42 +308,3 @@ partyInput.addEventListener("input", () => {
   partyLabel.textContent = `Party size: ${partySize}` // Update input label
 })
 partyButton.addEventListener("click", submitPartysize)
-
-// Confirm price
-// yesButton.addEventListener("click", () => finalConfirm("yes"))
-// noButton.addEventListener("click", () => finalConfirm("no"))
-
-
-// ---------------------------------
-/* OVERVIEW OF FUNCTIONS / FLOW
--->  greetUser 
-Show greeting and ask for userName
-
-submitName 
---> save name and send to showMessage,
-calls next step
-
---> chooseFood 
-ask for food choice, 
-calls next step
-
---> displayFood 
-changes to buttons with food alternatives
-
---> selectPizza || selectPasta || selectSalad 
-logs mainFoodChoice and sends to showMessage
-call next step display
-
---> displayPizzaSubtypes || displayPastaSubtypes || displaySaladSubtypes
-change to buttons with subtypes correspondning to main choice,
-
---> selectSubtype
-Logs subtype choice and sends to showMessage,
-calls next step
-
---> selectParty
-
-
-*/
-
-
