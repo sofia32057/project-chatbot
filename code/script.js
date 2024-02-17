@@ -3,6 +3,10 @@ const chat = document.getElementById('chat')
 const inputWrapper = document.getElementById('input-wrapper')
 const nameButton = document.querySelector("button[class='send-btn']")
 const nameInput = document.getElementById('name-input')
+const saladButton = document.getElementById('salad')
+const noodleButton = document.getElementById('noodle')
+const pastaButton = document.getElementById("pasta")
+const curryButton = document.getElementById('curry')
 
 //const daySelection = document.getElementById('day')
 
@@ -13,6 +17,8 @@ const nameInput = document.getElementById('name-input')
 let userName = ""
 let dayChoose = ""
 let userChoseDay = ""
+let foodMonday = ""
+let foodTuesday = ""
 
 
 
@@ -101,37 +107,56 @@ const daySelected = (event) => {
 
 const foodSelect = () => {
   showMessage(`I have prepared two types of food for you on ${userChoseDay}. Please select the one you prefer`, 'bot')
+  botMenu()
+}
 
+const botMenu = () => {
+  if (userChoseDay === "Monday"){
+    inputWrapper.innerHTML = `<div class="button-form">
+    <button id="Salad" type="Submit">Salad</button>
+    <button id="Noodle" type="Submib">Noodle</button>
+    </div>`
+    saladButton.addEventListener('click', ()=>{
+      foodMonday = 'salad'
+      inputWrapper.innerHTML= ""
+      showMessage(`I would like to make ${foodMonday} today.`, 'user')
+    })
+    noodleButton.addEventListener(`click`, ()=>{
+      foodMonday = 'noodle'
+      inputWrapper.innerHTML= ""
+      showMessage(`I would like to make ${foodMonday} today.`, 'user')
+      
+    })
+  }else if (userChoseDay === "Tuesday"){
+    inputWrapper.innerHTML = `<div class="button-form">
+    <button id="pasta" type="Submit">Pasta</button>
+    <button id="curry" type="Submib">Curry</button>
+    </div>`
+    pastaButton.addEventListener('click', ()=>{
+      foodTuesday = 'pasta'
+      inputWrapper.innerHTML= ""
+      showMessage(`I would like to make ${foodMonday} today.`, 'user')
+      
+    })
+    curryButton.addEventListener(`click`, ()=>{
+      foodTuesday = 'curry'
+      inputWrapper.innerHTML= ""
+      showMessage(`I would like to make ${foodMonday} today.`, 'user') 
+    })
+}else {
+  showMessage(`Your weekly menu is updating...`, 'bot')
+}
 }
   
- 
 
-  /*const daySelected = () =>{
-  switch (dayChoose){
-    case "Monday": 
-      break
-    case "Tuesday":
-      break
-    case "Wednesday":
-      break
-    case "Thursday":
-      break
-    case "Friday":
-      break
-    case "Saturday":
-      break
-    case "Sunday":
-      break
-    default:
-      'Unknown';
-  }
-  showMessage(`You have chosen ${chooseDay}. I have prepare two choices for you, please click your meal!`, 'bot')
-}*/
+
+ 
 
 
 // Eventlisteners goes here 👇
 
 nameButton.addEventListener('click', nameFilling)
+
 
 
 
@@ -145,4 +170,3 @@ nameButton.addEventListener('click', nameFilling)
 // 1.) the function we want to delay, and 2.) the delay in milliseconds 
 // This means the greeting function will be called one second after the website is loaded.
 setTimeout(greetUser, 1000)
- 
